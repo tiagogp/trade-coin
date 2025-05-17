@@ -1,54 +1,36 @@
-<div align="center">
-  <a href="https://trade-coin.vercel.app/">
-  <img height="64px" src="https://cdn.discordapp.com/attachments/437386668756959245/963626271655481384/trade-coin.png"/>
-  </a>
-</div>
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-<br>
+## Getting Started
 
-<div style="display: flex; width: 100%; bavkground: #ccc; g" align="center" >
-  <img style="border-radius: 8px;" src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB"/>
-  <img style="border-radius: 8px;" src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white"/>
-  <img style="border-radius: 8px;" src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white"/>
-</div>
-
-<br>
-
-<div style="display: flex;" align="center" >
-  <img style="border-radius: 8px; max-height: 400px; max-width: 700px;" src="https://cdn.discordapp.com/attachments/494671180377227264/1036299708307603638/ezgif.com-gif-maker.gif"  width="100%" height="100%" />
-</div>
-
-## 💻 Descrição
-
-O Trade Coin é um projeto pessoal, sobre crypto. Basicamente consumo api da [coingecko](https://www.coingecko.com/en/api/documentation) e exibo os dados de algumas moedas.
-
-Também é possível ver o histórico de preço de uma moeda, e ver o preço atual dela. Com gráficos e tudo mais.
-
-## 🛠 Tecnologias
-
-Esse projeto foi desenvolvido com as seguintes tecnologias:
-
-- [**Next.js**](https://nextjs.org/)
-- [**TypeScript**](https://www.typescriptlang.org/)
-- [**Tailwind CSS**](https://tailwindcss.com/)
-
-## 🔖 Layout
-
-Para dar uma olhada no layout, [clique aqui](https://www.figma.com/file/j7vob4OeBgRBZJFXjR9f3d/TradeCoin?node-id=301%3A288).
-
-## 🚀 Como executar
+First, run the development server:
 
 ```bash
-# Clone o repositório
-$ git clone https://github.com/TiagoGP-exe/trade-coin.git && cd trade-coin
-# Instale as dependências
-$ yarn
-# Inicie o servidor
-$ yarn dev
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Agora você pode acessar [`localhost:3000`](http://localhost:3000) do seu navegador.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
----
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-<p align="center">Made with ❤️ by <a href="https://github.com/TiagoGP-exe"><b>Tiago Guimarães </b></a></p>
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
