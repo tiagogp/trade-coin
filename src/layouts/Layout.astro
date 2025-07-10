@@ -1,0 +1,26 @@
+---
+import BreadcrumbsFromPath from "../components/BreadcrumbsFromPath.astro";
+import { Container } from "../components/Container";
+import { Footer } from "../components/Footer";
+import { Header } from "../components/Header";
+import "../styles/global.css";
+---
+
+<html lang="en">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="generator" content={Astro.generator} />
+  <title>Astro Basics</title>
+
+  <body
+    class="dark:bg-zinc-950/95 dark:text-zinc-50 bg-zinc-50 text-zinc-900 min-h-svh py-12 px-4 flex flex-col items-center"
+  >
+    <BreadcrumbsFromPath />
+    <Container>
+      <Header borderBottom />
+      <slot />
+      <Footer />
+    </Container>
+  </body>
+</html>

@@ -1,0 +1,93 @@
+---
+import axios from "axios";
+import type { ICoinProps, ICoinResponse } from "../../services/types";
+import { getTopCoins } from "../../utils/coin-cache";
+import Layout from "../../layouts/Layout.astro";
+import { Container } from "../../components/Container";
+import { Header } from "../../components/Header";
+import Image from "astro/components/Image.astro";
+import { formatNumber } from "../../lib/currency";
+import Percentage from "../../components/Percentage";
+import BreadcrumbsFromPath from "../../components/BreadcrumbsFromPath.astro";
+
+export async function getStaticPaths() {
+  const coins = await getTopCoins();
+
+  return coins.map((coin) => ({
+    params: { id: coin.id },
+  }));
+}
+
+const { id } = Astro.params;
+
+let coin: ICoinProps | undefined;
+let erro: string | null = null;
+
+try {
+  const coins = await getTopCoins();
+  coin = coins.find((c) => c.id === id);
+  if (!coin) throw new Error("Moeda não encontrada");
+} catch (e) {
+  erro = (e as Error).message;
+}
+
+if (!coin) {
+  return null;
+}
+---
+
+<Layout>
+  <div class="p-8 w-full">
+    <div class="w-full flex items-center justify-between">
+      <div class="flex gap-3 items-center">
+        <Image
+          src={`https://assets.coincap.io/assets/icons/${coin.symbol?.toLowerCase()}@2x.png`}
+          alt={coin?.name || ""}
+          width={64}
+          height={64}
+          class="rounded-full w-16 h-16"
+          onerror="this.onerror=null; this.src='/src/assets/placeholder.png';"
+        />
+        <div class="flex flex-col">
+          <p class="font-bold text-2xl leading-tight">{coin?.name}</p>
+          <span class="font-semibold text-gray-400 leading-tight">
+            {coin?.symbol?.toUpperCase()}
+          </span>
+        </div>
+      </div>
+      <div>
+        <p class="text-xl">
+          {formatNumber(Number(coin.priceUsd), "usd")}
+          <Percentage value={Number(coin.changePercent24Hr)} />
+        </p>
+        <!-- <p class="flex-1 text-right">
+            {formatNumber(Number(coin.marketCapUsd), "usd")}
+          </p>
+          <p class="flex-1 text-right">
+            {formatNumber(Number(coin.maxSupply), "usd")}
+          </p>
+          <p class="flex-1 text-right">
+            {formatNumber(Number(coin.supply), "usd")}
+          </p> -->
+      </div>
+    </div>
+    {
+      erro || !coin ? (
+        <p>Erro: {erro}</p>
+      ) : (
+        <div>
+          <h1>
+            {coin.name} ({coin.symbol})
+          </h1>
+          <p>Preço: ${parseFloat(coin.priceUsd).toFixed(2)}</p>
+          <p>Variação 24h: {parseFloat(coin.changePercent24Hr).toFixed(2)}%</p>
+          <p>
+            <a href={coin.explorer} target="_blank">
+              Explorer
+            </a>
+          </p>
+        </div>
+      )
+    }
+  </div>
+</Layout>

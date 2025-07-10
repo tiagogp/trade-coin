@@ -1,0 +1,14 @@
+---
+import { Container } from "../components/Container";
+import { Footer } from "../components/Footer";
+import { Header } from "../components/Header";
+import CoinItem from "../components/itemCoin.astro";
+import Layout from "../layouts/Layout.astro";
+import { getTopCoins } from "../utils/coin-cache";
+
+const coins = await getTopCoins();
+---
+
+<Layout>
+  {coins.map((coin) => <CoinItem {...coin} />)}
+</Layout>

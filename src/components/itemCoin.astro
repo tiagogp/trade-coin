@@ -1,0 +1,44 @@
+---
+import { formatNumber } from "../lib/currency";
+import type { ICoinProps } from "../services/types";
+import Percentage from "./Percentage";
+
+const coin = Astro.props as ICoinProps;
+---
+
+<!-- $104,305.45	$2.08t	$104,704.83	19.88m	$13.38b	0.60% -->
+<a
+  href={`coin/${coin.id}`}
+  class="flex gap-3 items-center border-t border-zinc-800 py-2 px-4 even:bg-zinc-700/10 first-of-type:border-t-0"
+>
+  <div class="flex items-center flex-1">
+    <div class="flex flex-1 gap-3 items-center">
+      <p class="font-bold">{coin.rank}</p>
+      <img
+        src={`https://assets.coincap.io/assets/icons/${coin.symbol?.toLowerCase()}@2x.png`}
+        alt={coin.name}
+        class="rounded-full w-[28px] h-[28px]"
+        loading="lazy"
+        onerror="this.onerror=null; this.src='/src/assets/placeholder.png';"
+      />
+      <b>{coin.name}</b>
+      <p class="font-semibold text-gray-400">
+        {coin.symbol?.toUpperCase()}
+      </p>
+    </div>
+
+    <p class="flex-1 text-right">
+      {formatNumber(Number(coin.priceUsd), "usd")}
+      <Percentage value={Number(coin.changePercent24Hr)} />
+    </p>
+    <p class="flex-1 text-right">
+      {formatNumber(Number(coin.marketCapUsd), "usd")}
+    </p>
+    <p class="flex-1 text-right">
+      {formatNumber(Number(coin.supply), "usd")}
+    </p>
+    <p class="flex-1 text-right">
+      {formatNumber(Number(coin.volumeUsd24Hr), "usd")}
+    </p>
+  </div>
+</a>
