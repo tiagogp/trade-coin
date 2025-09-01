@@ -1,3 +1,5 @@
+'use client'
+
 import { useTheme } from 'next-themes'
 import { FC } from 'react'
 import { BsFillMoonStarsFill, BsSun } from 'react-icons/bs'

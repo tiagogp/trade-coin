@@ -49,17 +49,6 @@ html {
   width: 0.6rem;
 }
 
-::-webkit-scrollbar-track {
-  opacity: 0;
-  background-color: #e2e8f0;
-}
-
-::-webkit-scrollbar-thumb {
-  opacity: 0;
-  background-color: #ffffff;
-  border-radius: 2px;
-}
-
 input[type='number'] {
   -moz-appearance: textfield;
 }

@@ -4,5 +4,4 @@ module.exports = {
     domains: ['assets.coingecko.com'],
   },
   reactStrictMode: true,
-  swcMinify: true,
 }

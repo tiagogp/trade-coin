@@ -1,4 +1,9 @@
 import { api } from './api'
+import type { IMarket } from 'interfaces/IMarket'
+
+export interface GetMarketResponse {
+  coinValues: IMarket[]
+}
 
 export const getMarket = async (currency: string) => {
   const { data } = await api.get('/coins/markets', {
@@ -11,5 +16,5 @@ export const getMarket = async (currency: string) => {
     },
   })
 
-  return data
+  return data as GetMarketResponse
 }
