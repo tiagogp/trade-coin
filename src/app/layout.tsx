@@ -1,4 +1,3 @@
-import '@/styles/globals.css'
 import { Metadata } from 'next'
 import { ThemeProvider } from 'next-themes'
 import { Footer } from 'src/components/footer-new'
@@ -8,6 +7,7 @@ import { CurrencyProvider } from 'src/hooks/Currency'
 import { fontSans } from 'src/lib/fonts'
 import { siteConfig } from 'src/lib/site'
 import { cn } from 'src/lib/utils'
+import '../styles/globals.css'
 
 export const metadata: Metadata = {
   title: {
@@ -22,7 +22,11 @@ export const metadata: Metadata = {
   },
 }
 
-interface RootLayoutProps {
+export interface IParams {
+  params: { currency: string }
+}
+
+interface RootLayoutProps extends IParams {
   children: React.ReactNode
 }
 
@@ -33,14 +37,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <head />
         <body
           className={cn(
-            'min-h-screen bg-popover font-sans text-foreground antialiased',
-            fontSans.variable
+            'min-h-screen bg-popover text-foreground antialiased',
+            fontSans.className
           )}
         >
           <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
             <CurrencyProvider>
               <div className='min-h-svh py-12 px-4 flex flex-col items-center'>
-                {/* <BreadcrumbsFromPath /> */}
                 <div className='bg-zinc-900 border border-zinc-800 rounded-md w-full max-w-7xl'>
                   <Header />
                   <div>{children}</div>

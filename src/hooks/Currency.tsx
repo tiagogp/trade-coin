@@ -1,43 +1,59 @@
 'use client'
 
-import Cookies from 'js-cookie'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { createContext, FC, useContext, useEffect, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import {
+  createContext,
+  FC,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 interface ICurrencyContext {
   atualCurrency: string
   setAtualCurrency(value: string): void
+  isClient: boolean
 }
 
 const CurrencyContext = createContext<ICurrencyContext | null>(null)
 
 export const CurrencyProvider: FC = ({ children }) => {
-  const [atualCurrency, setAtualCurrency] = useState('usd')
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const [isClient, setIsClient] = useState(false)
+
+  const pathname = usePathname()
+  const segments = useMemo(
+    () => pathname.split('/').filter(Boolean),
+    [pathname]
+  )
+  const { push } = useRouter()
+
+  const [atualCurrency, setAtualCurrency] = useState(segments[0] || 'usd')
 
   const SetValue = (value: string) => {
-    Cookies.set('currency-cookie', value)
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('currency', value)
-    router.push(`?${params.toString()}`, { scroll: false })
+    const newURL = segments.map((item, index) => {
+      if (index === 0) return value
+
+      return item
+    })
+
+    push(`/${newURL.join('/')}`)
     setAtualCurrency(value)
   }
 
   useEffect(() => {
-    const currency = Cookies.get('currency-cookie')
-
-    if (currency) {
-      setAtualCurrency(currency)
-      return
+    if (segments?.[0] && segments?.[0] !== atualCurrency) {
+      setAtualCurrency(segments?.[0])
     }
+  }, [segments])
 
-    Cookies.set('currency-cookie', 'usd')
+  useEffect(() => {
+    setIsClient(true)
   }, [])
 
   return (
     <CurrencyContext.Provider
-      value={{ atualCurrency, setAtualCurrency: SetValue }}
+      value={{ atualCurrency, setAtualCurrency: SetValue, isClient }}
     >
       {children}
     </CurrencyContext.Provider>

@@ -1,9 +1,9 @@
-import { FC } from 'react'
-import { AiFillCaretDown, AiFillCaretUp } from 'react-icons/ai'
-import { useCurrency } from '../hooks/Currency'
 import { IMarket } from '../../interfaces/IMarket'
+import { useCurrency } from '../hooks/Currency'
 import { formatNumber, manualFormarNumber } from '../utils/currency'
 import Image from 'next/image'
+import { FC } from 'react'
+import { AiFillCaretDown, AiFillCaretUp } from 'react-icons/ai'
 
 export interface CoinInfosProps {
   infos: IMarket

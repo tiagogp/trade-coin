@@ -1,28 +1,14 @@
-import type { IMarket } from 'interfaces/IMarket'
-import Cookies from 'js-cookie'
-import CoinItem from 'src/components/coin-item'
-import { buildUrlWithParams } from 'src/services/api'
+'use client'
 
-export const revalidate = 3600
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default async function Home() {
-  const currency = Cookies.get('currency') || 'usd'
+  const { replace } = useRouter()
 
-  const url = buildUrlWithParams('/api/v3/coins/markets', {
-    vs_currency: currency,
-    order: 'market_cap_desc',
-    per_page: 100,
-    page: 1,
-    sparkline: true,
-  })
+  useEffect(() => {
+    replace('/usd')
+  }, [])
 
-  const res = await fetch(url.toString(), {
-    next: { revalidate },
-  })
-
-  const data = (await res.json()) as IMarket[]
-
-  return data?.map((coin, index) => (
-    <CoinItem key={coin.id} coin={coin} index={index + 1} currency={currency} />
-  ))
+  return null
 }

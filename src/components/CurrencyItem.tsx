@@ -3,10 +3,10 @@
 import { useCurrency } from '../hooks/Currency'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
-
-const currency = ['usd', 'eur', 'brl']
+import { SUPPORTED_CURRENCIES } from 'src/lib/constants'
 
 const CurrencyItem = () => {
   const { atualCurrency, setAtualCurrency } = useCurrency()
@@ -26,18 +26,18 @@ const CurrencyItem = () => {
         type='button'
         onClick={() => setIsVisible(true)}
         onBlur={() => closeModal()}
-        className='relative w-full  dark:bg-zinc-800 border duration-150 border-zinc-600 rounded-md shadow-sm pl-3 pr-10 xl:pr-6 cursor-pointer ease-out py-2 text-left  focus:ring-1 focus:ring-offset-blue-600 sm:text-sm'
+        className='relative w-full flex gap-3 bg-zinc-800 border duration-150 border-zinc-600 rounded-md shadow-sm  cursor-pointer ease-out py-1.5 px-3 text-left focus:border-amber-500/30 sm:text-sm'
       >
-        <span className='flex items-center '>
+        <span className='flex items-center gap-2'>
           <Image
             src={`/${atualCurrency?.toUpperCase()}.png`}
             alt='currency'
             width={24}
             height={24}
           />
-          <span className='ml-2 pr-2'>{atualCurrency?.toUpperCase()}</span>
+          <span className=''>{atualCurrency?.toUpperCase()}</span>
         </span>
-        <span className=' absolute inset-y-0 right-0 flex flex-col items-center pr-3 pointer-events-none text-gray-400 justify-center'>
+        <span className=' flex flex-col items-center pointer-events-none text-gray-400 justify-center'>
           <FaChevronUp size={10} />
           <FaChevronDown size={10} />
         </span>
@@ -54,7 +54,7 @@ const CurrencyItem = () => {
             aria-labelledby='listbox-label'
             aria-activedescendant='listbox-option-3'
           >
-            {currency.map(item => (
+            {SUPPORTED_CURRENCIES.map(item => (
               <li
                 key={item}
                 className={`${

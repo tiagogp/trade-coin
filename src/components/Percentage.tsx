@@ -7,11 +7,11 @@ interface PercetageProps {
 
 const Percentage: FC<PercetageProps> = ({ value }) => (
   <div
-    className={`flex font-semibold justify-center gap-1 ${
+    className={`flex font-semibold justify-center items-center gap-1 ${
       value > 0 ? 'text-green-500' : 'text-red-500'
     }`}
   >
-    {value > 0 ? <AiFillCaretUp /> : <AiFillCaretDown />}
+    {value > 0 ? <AiFillCaretUp size={10} /> : <AiFillCaretDown size={10} />}
     <p className='sm:flex justify-end md:justify-center '>
       {value?.toFixed(2).toString().replace('-', '')}%
     </p>
