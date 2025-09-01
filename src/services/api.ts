@@ -32,15 +32,11 @@ export async function fetchWithParams<T = unknown>(
     url.searchParams.append(key, String(value))
   })
 
-  console.log({ url })
-
   const res = await fetch(url.toString(), {
     next: { revalidate },
   })
 
   if (!res.ok) {
-    // console.log(res)
-
     return [] as T
   }
 
