@@ -4,6 +4,8 @@ import { Container } from "../components/Container";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
 import "../styles/global.css";
+
+const { showHeaderColumns = true } = Astro.props;
 ---
 
 <html lang="en">
@@ -18,7 +20,7 @@ import "../styles/global.css";
   >
     <BreadcrumbsFromPath />
     <Container>
-      <Header borderBottom />
+      <Header showColumns={showHeaderColumns} />
       <slot />
       <Footer />
     </Container>

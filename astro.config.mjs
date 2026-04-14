@@ -7,15 +7,14 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  experimental: {
-    fonts: [
-      {
-        provider: fontProviders.google(),
-        name: "Cabin",
-        cssVariable: "--font-cabin",
-      },
-    ],
-  },
+  fonts: [
+    {
+      provider: fontProviders.google(),
+      name: "Cabin",
+      cssVariable: "--font-cabin",
+    },
+  ],
+
   integrations: [react()],
 
   vite: {

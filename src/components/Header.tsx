@@ -1,7 +1,11 @@
 import logo from "../assets/logo-light.svg";
 import { cn } from "../lib/utils";
 
-export const Header = () => (
+type HeaderProps = {
+  showColumns?: boolean;
+};
+
+export const Header = ({ showColumns = true }: HeaderProps) => (
   <div
     className={cn(
       " flex flex-col items-center justify-between border-zinc-800 border-b gap-1"
@@ -24,23 +28,25 @@ export const Header = () => (
       />
     </div>
 
-    <div className="flex items-center w-full border-zinc-800 border-t py-2 px-4">
-      <div className="flex flex-1">
-        <p className="font-semibold text-gray-400">Name</p>
-      </div>
+    {showColumns ? (
+      <div className="flex items-center w-full border-zinc-800 border-t py-2 px-4">
+        <div className="flex flex-1">
+          <p className="font-semibold text-gray-400">Name</p>
+        </div>
 
-      <p className="flex-1 text-right">
-        <p className="font-semibold text-gray-400">Price</p>
-      </p>
-      <p className="flex-1 text-right">
-        <p className="font-semibold text-gray-400">Market cap</p>
-      </p>
-      <p className="flex-1 text-right">
-        <p className="font-semibold text-gray-400">Supply</p>
-      </p>
-      <p className="flex-1 text-right">
-        <p className="font-semibold text-gray-400">Volume (24Hr)</p>
-      </p>
-    </div>
+        <p className="flex-1 text-right">
+          <p className="font-semibold text-gray-400">Price</p>
+        </p>
+        <p className="flex-1 text-right">
+          <p className="font-semibold text-gray-400">Market cap</p>
+        </p>
+        <p className="flex-1 text-right">
+          <p className="font-semibold text-gray-400">Supply</p>
+        </p>
+        <p className="flex-1 text-right">
+          <p className="font-semibold text-gray-400">Volume (24Hr)</p>
+        </p>
+      </div>
+    ) : null}
   </div>
 );

@@ -1,14 +1,9 @@
 ---
-import axios from "axios";
-import type { ICoinProps, ICoinResponse } from "../../services/types";
+import type { ICoinProps } from "../../services/types";
 import { getTopCoins } from "../../utils/coin-cache";
 import Layout from "../../layouts/Layout.astro";
-import { Container } from "../../components/Container";
-import { Header } from "../../components/Header";
-import Image from "astro/components/Image.astro";
 import { formatNumber } from "../../lib/currency";
-import Percentage from "../../components/Percentage";
-import BreadcrumbsFromPath from "../../components/BreadcrumbsFromPath.astro";
+import placeholder from "../../assets/placeholder.png";
 
 export async function getStaticPaths() {
   const coins = await getTopCoins();
@@ -31,63 +26,571 @@ try {
   erro = (e as Error).message;
 }
 
-if (!coin) {
-  return null;
-}
+const symbol = coin?.symbol?.toUpperCase() ?? "";
+const name = coin?.name ?? "";
+const rank = coin?.rank ?? "";
+const priceUsd = coin?.priceUsd ? Number(coin.priceUsd) : NaN;
+const changePercent24Hr = coin?.changePercent24Hr
+  ? Number(coin.changePercent24Hr)
+  : NaN;
+const changeUp = Number.isFinite(changePercent24Hr) ? changePercent24Hr >= 0 : true;
+const changeAbsUsd =
+  Number.isFinite(priceUsd) && Number.isFinite(changePercent24Hr)
+    ? (priceUsd * changePercent24Hr) / 100
+    : NaN;
+const marketCapUsd = coin?.marketCapUsd ? Number(coin.marketCapUsd) : NaN;
+const volumeUsd24Hr = coin?.volumeUsd24Hr ? Number(coin.volumeUsd24Hr) : NaN;
+const supply = coin?.supply ? Number(coin.supply) : NaN;
+const maxSupply = coin?.maxSupply ? Number(coin.maxSupply) : NaN;
+const fullyDilutedMarketCapUsd =
+  Number.isFinite(maxSupply) && Number.isFinite(priceUsd)
+    ? maxSupply * priceUsd
+    : NaN;
+const vwap24Hr = coin?.vwap24Hr ? Number(coin.vwap24Hr) : NaN;
+const iconUrl = coin?.symbol
+  ? `https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`
+  : placeholder.src;
+
+const publicBaseApi = import.meta.env.PUBLIC_BASE_API?.replace(/\/$/, "") ?? "";
+const publicApiKey = import.meta.env.PUBLIC_KEY_API ?? "";
 ---
 
-<Layout>
-  <div class="p-8 w-full">
-    <div class="w-full flex items-center justify-between">
-      <div class="flex gap-3 items-center">
-        <Image
-          src={`https://assets.coincap.io/assets/icons/${coin.symbol?.toLowerCase()}@2x.png`}
-          alt={coin?.name || ""}
-          width={64}
-          height={64}
-          class="rounded-full w-16 h-16"
-          onerror="this.onerror=null; this.src='/src/assets/placeholder.png';"
-        />
-        <div class="flex flex-col">
-          <p class="font-bold text-2xl leading-tight">{coin?.name}</p>
-          <span class="font-semibold text-gray-400 leading-tight">
-            {coin?.symbol?.toUpperCase()}
-          </span>
-        </div>
-      </div>
-      <div>
-        <p class="text-xl">
-          {formatNumber(Number(coin.priceUsd), "usd")}
-          <Percentage value={Number(coin.changePercent24Hr)} />
-        </p>
-        <!-- <p class="flex-1 text-right">
-            {formatNumber(Number(coin.marketCapUsd), "usd")}
-          </p>
-          <p class="flex-1 text-right">
-            {formatNumber(Number(coin.maxSupply), "usd")}
-          </p>
-          <p class="flex-1 text-right">
-            {formatNumber(Number(coin.supply), "usd")}
-          </p> -->
-      </div>
-    </div>
+<Layout showHeaderColumns={false}>
+  <div class="w-full px-4 py-6 md:px-8 md:py-8">
     {
       erro || !coin ? (
-        <p>Erro: {erro}</p>
+        <div class="px-4 py-10 md:px-8">
+          <p class="text-sm font-semibold text-zinc-400">Erro</p>
+          <h1 class="text-2xl md:text-3xl font-bold mt-1">{erro}</h1>
+          <a
+            href="/"
+            class="inline-flex mt-6 items-center justify-center rounded-md border border-zinc-700 bg-zinc-800/40 px-4 py-2 font-semibold hover:bg-zinc-800/60 transition-colors"
+          >
+            Voltar
+          </a>
+        </div>
       ) : (
-        <div>
-          <h1>
-            {coin.name} ({coin.symbol})
-          </h1>
-          <p>Preço: ${parseFloat(coin.priceUsd).toFixed(2)}</p>
-          <p>Variação 24h: {parseFloat(coin.changePercent24Hr).toFixed(2)}%</p>
-          <p>
-            <a href={coin.explorer} target="_blank">
-              Explorer
-            </a>
-          </p>
+        <div class="flex flex-col gap-8">
+          <div class="flex items-start justify-between gap-6">
+            <div class="flex items-center gap-3">
+              <img
+                src={iconUrl}
+                alt={name}
+                width={48}
+                height={48}
+                class="rounded-full w-10 h-10 md:w-12 md:h-12 border border-zinc-800 bg-zinc-800/20"
+                loading="lazy"
+                onerror={`this.onerror=null; this.src='${placeholder.src}';`}
+              />
+
+              <div class="leading-tight">
+                <p class="text-sm font-semibold text-zinc-400">{name}</p>
+                <p class="text-2xl md:text-3xl font-bold tracking-tight">
+                  {name}
+                </p>
+                <p class="text-xs font-semibold text-zinc-400 mt-1">
+                  {symbol}
+                </p>
+              </div>
+            </div>
+
+            <div class="text-right">
+              <div class="flex items-center justify-end gap-3">
+                <p class="text-2xl md:text-3xl font-bold tracking-tight">
+                  {Number.isFinite(priceUsd)
+                    ? formatNumber(priceUsd, "usd")
+                    : "-"}
+                </p>
+                <div
+                  class={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-semibold border ${
+                    changeUp
+                      ? "text-green-400 bg-green-500/10 border-green-500/20"
+                      : "text-red-400 bg-red-500/10 border-red-500/20"
+                  }`}
+                >
+                  <span class="leading-none">{changeUp ? "▲" : "▼"}</span>
+                  <span>
+                    {Number.isFinite(changePercent24Hr)
+                      ? Math.abs(changePercent24Hr).toFixed(2)
+                      : "0.00"}
+                    %
+                  </span>
+                </div>
+              </div>
+              <p class="text-xs font-semibold text-zinc-400 mt-2">
+                Rank <span class="text-zinc-200">#{rank}</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2">
+              <div class="flex flex-col gap-4">
+                <div
+                  class="flex flex-col md:flex-row items-stretch md:items-center gap-4 md:gap-6"
+                >
+                  <div
+                    class="w-full flex items-stretch rounded-md border border-zinc-800 bg-zinc-800/20 overflow-hidden"
+                  >
+                    <div
+                      class="px-4 py-3 flex items-center font-bold text-sm text-zinc-200 bg-zinc-800/40 border-r border-zinc-800 min-w-[84px] justify-center"
+                    >
+                      {symbol}
+                    </div>
+                    <input
+                      id="coin-amount"
+                      type="number"
+                      step="any"
+                      inputmode="decimal"
+                      value="1"
+                      class="flex-1 bg-transparent px-4 py-3 outline-none text-zinc-50 placeholder:text-zinc-500"
+                      aria-label={`Valor em ${symbol}`}
+                    />
+                  </div>
+
+                  <div class="hidden md:flex items-center justify-center text-zinc-500">
+                    <span class="text-xl select-none">⇄</span>
+                  </div>
+
+                  <div
+                    class="w-full flex items-stretch rounded-md border border-zinc-800 bg-zinc-800/20 overflow-hidden"
+                  >
+                    <div
+                      class="px-4 py-3 flex items-center font-bold text-sm text-zinc-200 bg-zinc-800/40 border-r border-zinc-800 min-w-[84px] justify-center"
+                    >
+                      USD
+                    </div>
+                    <input
+                      id="usd-amount"
+                      type="number"
+                      step="any"
+                      inputmode="decimal"
+                      value={Number.isFinite(priceUsd) ? String(priceUsd) : "0"}
+                      class="flex-1 bg-transparent px-4 py-3 outline-none text-zinc-50 placeholder:text-zinc-500"
+                      aria-label="Valor em USD"
+                    />
+                  </div>
+                </div>
+
+                <p class="text-sm font-semibold text-zinc-400">
+                  Taxa: 1 {symbol} ={" "}
+                  <span class="text-zinc-200">
+                    {Number.isFinite(priceUsd) ? formatNumber(priceUsd, "usd") : "-"}
+                  </span>
+                </p>
+
+                <div class="rounded-md border border-zinc-800 bg-zinc-800/10 p-5 md:p-6">
+                  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                      <h2 class="text-xl font-bold tracking-tight">
+                        {symbol} Price Chart
+                      </h2>
+                      <p
+                        id="chart-subtitle"
+                        class="text-sm font-semibold text-zinc-400 mt-1"
+                      >
+                        Carregando…
+                      </p>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        data-range="1D"
+                        class="chart-range inline-flex items-center justify-center rounded-md border border-zinc-700 bg-zinc-800/40 px-3 py-1.5 text-sm font-semibold hover:bg-zinc-800/60 transition-colors"
+                      >
+                        1D
+                      </button>
+                      <button
+                        type="button"
+                        data-range="7D"
+                        class="chart-range inline-flex items-center justify-center rounded-md border border-zinc-700 bg-zinc-800/40 px-3 py-1.5 text-sm font-semibold hover:bg-zinc-800/60 transition-colors"
+                      >
+                        7D
+                      </button>
+                      <button
+                        type="button"
+                        data-range="1M"
+                        class="chart-range inline-flex items-center justify-center rounded-md border border-zinc-700 bg-zinc-800/40 px-3 py-1.5 text-sm font-semibold hover:bg-zinc-800/60 transition-colors"
+                      >
+                        1M
+                      </button>
+                      <button
+                        type="button"
+                        data-range="1Y"
+                        class="chart-range inline-flex items-center justify-center rounded-md border border-zinc-700 bg-zinc-800/40 px-3 py-1.5 text-sm font-semibold hover:bg-zinc-800/60 transition-colors"
+                      >
+                        1Y
+                      </button>
+                      <button
+                        type="button"
+                        data-range="ALL"
+                        class="chart-range inline-flex items-center justify-center rounded-md border border-zinc-700 bg-zinc-800/40 px-3 py-1.5 text-sm font-semibold hover:bg-zinc-800/60 transition-colors"
+                      >
+                        ALL
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mt-5 relative">
+                    <div
+                      class="absolute inset-0 rounded-md bg-gradient-to-b from-zinc-800/10 to-transparent pointer-events-none"
+                    />
+
+                    <svg
+                      id="price-chart"
+                      viewBox="0 0 600 240"
+                      class="w-full h-56 md:h-72"
+                      role="img"
+                      aria-label={`Gráfico de preço de ${symbol}`}
+                      preserveAspectRatio="none"
+                    >
+                      <defs>
+                        <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stop-color="rgb(234 179 8 / 0.20)" />
+                          <stop offset="100%" stop-color="rgb(234 179 8 / 0)" />
+                        </linearGradient>
+                      </defs>
+
+                      <g opacity="0.25" stroke="rgb(63 63 70 / 0.8)">
+                        <line x1="0" y1="40" x2="600" y2="40" />
+                        <line x1="0" y1="80" x2="600" y2="80" />
+                        <line x1="0" y1="120" x2="600" y2="120" />
+                        <line x1="0" y1="160" x2="600" y2="160" />
+                        <line x1="0" y1="200" x2="600" y2="200" />
+                      </g>
+
+                      <path
+                        id="chart-area"
+                        d=""
+                        fill="url(#chartFill)"
+                        opacity="1"
+                      />
+                      <polyline
+                        id="chart-line"
+                        fill="none"
+                        stroke="rgb(234 179 8)"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        points=""
+                      />
+                    </svg>
+
+                    <div class="mt-3 flex items-center justify-between gap-4 text-sm">
+                      <p id="chart-min" class="font-semibold text-zinc-400">Min: -</p>
+                      <p id="chart-max" class="font-semibold text-zinc-400">Max: -</p>
+                    </div>
+
+                    <p
+                      id="chart-status"
+                      class="mt-3 text-sm font-semibold text-zinc-400 hidden"
+                    >
+                      Carregando…
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <aside
+              class="rounded-md border border-zinc-800 bg-zinc-800/10 p-5 md:p-6"
+            >
+              <h2 class="text-xl font-bold tracking-tight">
+                {symbol} Price Statistics
+              </h2>
+              <div class="mt-6 flex flex-col gap-4 text-sm">
+                <div class="flex items-center justify-between gap-4">
+                  <p class="font-semibold text-zinc-400">Market Rank</p>
+                  <p class="font-bold text-zinc-50">#{rank}</p>
+                </div>
+
+                <div class="flex items-center justify-between gap-4">
+                  <p class="font-semibold text-zinc-400">{name} Price</p>
+                  <p class="font-bold text-zinc-50">
+                    {Number.isFinite(priceUsd) ? formatNumber(priceUsd, "usd") : "-"}
+                  </p>
+                </div>
+
+                <div class="flex items-center justify-between gap-4">
+                  <p class="font-semibold text-zinc-400">Price change 24H</p>
+                  <div class="text-right">
+                    <p class="font-bold text-zinc-50">
+                      {Number.isFinite(changeAbsUsd)
+                        ? formatNumber(Math.abs(changeAbsUsd), "usd")
+                        : "-"}
+                    </p>
+                    <p
+                      class={`text-xs font-semibold ${
+                        changeUp ? "text-green-400" : "text-red-400"
+                      }`}
+                    >
+                      {Number.isFinite(changePercent24Hr)
+                        ? `${changeUp ? "▲" : "▼"} ${Math.abs(
+                            changePercent24Hr
+                          ).toFixed(2)}%`
+                        : "-"}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between gap-4">
+                  <p class="font-semibold text-zinc-400">VWAP (24H)</p>
+                  <p class="font-bold text-zinc-50">
+                    {Number.isFinite(vwap24Hr) ? formatNumber(vwap24Hr, "usd") : "-"}
+                  </p>
+                </div>
+
+                <div class="flex items-center justify-between gap-4">
+                  <p class="font-semibold text-zinc-400">Market Cap</p>
+                  <p class="font-bold text-zinc-50">
+                    {Number.isFinite(marketCapUsd)
+                      ? formatNumber(marketCapUsd, "usd")
+                      : "-"}
+                  </p>
+                </div>
+
+                <div class="flex items-center justify-between gap-4">
+                  <p class="font-semibold text-zinc-400">Volume (24H)</p>
+                  <p class="font-bold text-zinc-50">
+                    {Number.isFinite(volumeUsd24Hr)
+                      ? formatNumber(volumeUsd24Hr, "usd")
+                      : "-"}
+                  </p>
+                </div>
+
+                <div class="flex items-center justify-between gap-4">
+                  <p class="font-semibold text-zinc-400">Supply</p>
+                  <p class="font-bold text-zinc-50">
+                    {Number.isFinite(supply) ? supply.toLocaleString("en-US") : "-"}
+                  </p>
+                </div>
+
+                <div class="flex items-center justify-between gap-4">
+                  <p class="font-semibold text-zinc-400">
+                    Fully Diluted Market Cap
+                  </p>
+                  <p class="font-bold text-zinc-50">
+                    {Number.isFinite(fullyDilutedMarketCapUsd)
+                      ? formatNumber(fullyDilutedMarketCapUsd, "usd")
+                      : "-"}
+                  </p>
+                </div>
+
+                <a
+                  href={coin.explorer}
+                  target="_blank"
+                  rel="noreferrer"
+                  class="mt-2 inline-flex items-center justify-center rounded-md border border-zinc-700 bg-zinc-800/40 px-4 py-2 font-semibold hover:bg-zinc-800/60 transition-colors"
+                >
+                  Explorer
+                </a>
+              </div>
+            </aside>
+          </div>
         </div>
       )
     }
   </div>
+
+  <script
+    define:vars={{
+      priceUsd: Number.isFinite(priceUsd) ? priceUsd : 0,
+      coinId: coin?.id ?? "",
+      baseApi: publicBaseApi,
+      apiKey: publicApiKey,
+    }}
+  >
+    const coinEl = document.getElementById("coin-amount");
+    const usdEl = document.getElementById("usd-amount");
+
+    if (coinEl && usdEl && priceUsd > 0) {
+      let updating = false;
+
+      const toNum = (value) => {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : 0;
+      };
+
+      const syncFromCoin = () => {
+        if (updating) return;
+        updating = true;
+        const coinAmount = toNum(coinEl.value);
+        usdEl.value = String(coinAmount * priceUsd);
+        updating = false;
+      };
+
+      const syncFromUsd = () => {
+        if (updating) return;
+        updating = true;
+        const usdAmount = toNum(usdEl.value);
+        coinEl.value = String(usdAmount / priceUsd);
+        updating = false;
+      };
+
+      coinEl.addEventListener("input", syncFromCoin);
+      usdEl.addEventListener("input", syncFromUsd);
+    }
+
+    const chartSvg = document.getElementById("price-chart");
+    const chartLine = document.getElementById("chart-line");
+    const chartArea = document.getElementById("chart-area");
+    const chartMin = document.getElementById("chart-min");
+    const chartMax = document.getElementById("chart-max");
+    const chartStatus = document.getElementById("chart-status");
+    const chartSubtitle = document.getElementById("chart-subtitle");
+    const rangeButtons = Array.from(document.querySelectorAll(".chart-range"));
+
+    const ranges = {
+      "1D": { label: "Últimas 24 horas", ms: 24 * 60 * 60 * 1000, interval: "h1" },
+      "7D": { label: "Últimos 7 dias", ms: 7 * 24 * 60 * 60 * 1000, interval: "h1" },
+      "1M": { label: "Últimos 30 dias", ms: 30 * 24 * 60 * 60 * 1000, interval: "d1" },
+      "1Y": { label: "Últimos 365 dias", ms: 365 * 24 * 60 * 60 * 1000, interval: "d1" },
+      ALL: { label: "All time", ms: null, interval: "d1" },
+    };
+
+    const clampPoints = (points, maxPoints) => {
+      if (points.length <= maxPoints) return points;
+      const stride = Math.ceil(points.length / maxPoints);
+      const result = [];
+      for (let i = 0; i < points.length; i += stride) result.push(points[i]);
+      return result;
+    };
+
+    const setActiveRange = (rangeKey) => {
+      for (const btn of rangeButtons) {
+        const active = btn.dataset.range === rangeKey;
+        btn.classList.toggle("bg-zinc-700/40", active);
+        btn.classList.toggle("border-yellow-500/30", active);
+        btn.classList.toggle("text-yellow-400", active);
+      }
+    };
+
+    const renderChart = (data) => {
+      if (!chartSvg || !chartLine || !chartArea || !chartMin || !chartMax) return;
+      if (!Array.isArray(data) || data.length < 2) {
+        chartLine.setAttribute("points", "");
+        chartArea.setAttribute("d", "");
+        chartMin.textContent = "Min: -";
+        chartMax.textContent = "Max: -";
+        return;
+      }
+
+      const width = 600;
+      const height = 240;
+      const padX = 8;
+      const padY = 10;
+
+      const prices = data.map((p) => p.price).filter((n) => Number.isFinite(n));
+      if (prices.length < 2) return;
+
+      let min = Math.min(...prices);
+      let max = Math.max(...prices);
+      if (min === max) {
+        min = min * 0.999;
+        max = max * 1.001;
+      }
+
+      const xStep = (width - padX * 2) / (data.length - 1);
+      const toY = (price) =>
+        padY +
+        (height - padY * 2) * (1 - (price - min) / (max - min));
+
+      const points = data
+        .map((p, i) => {
+          const x = padX + xStep * i;
+          const y = toY(p.price);
+          return `${x.toFixed(2)},${y.toFixed(2)}`;
+        })
+        .join(" ");
+
+      chartLine.setAttribute("points", points);
+
+      const first = points.split(" ")[0];
+      const last = points.split(" ").at(-1);
+      const areaD = `M ${first} L ${points} L ${width - padX} ${height - padY} L ${padX} ${height - padY} Z`;
+      chartArea.setAttribute("d", areaD);
+
+      chartMin.textContent = `Min: $${min.toFixed(2)}`;
+      chartMax.textContent = `Max: $${max.toFixed(2)}`;
+    };
+
+    const fetchHistory = async (rangeKey) => {
+      if (!coinId) {
+        if (chartSubtitle) chartSubtitle.textContent = "Sem dados para exibir.";
+        return;
+      }
+
+      const range = ranges[rangeKey] ?? ranges["7D"];
+      const end = Date.now();
+      const start =
+        range.ms == null ? end - 5 * 365 * 24 * 60 * 60 * 1000 : end - range.ms;
+
+      if (chartStatus) {
+        chartStatus.textContent = "Carregando…";
+        chartStatus.classList.remove("hidden");
+      }
+      if (chartSubtitle) chartSubtitle.textContent = range.label;
+
+      try {
+        const endpointUrl = `/api/coin/${encodeURIComponent(
+          coinId
+        )}/history?range=${encodeURIComponent(rangeKey)}`;
+        let res = await fetch(endpointUrl, { cache: "no-store" });
+        let json;
+
+        if (res.ok) {
+          json = await res.json();
+        } else if (baseApi && apiKey) {
+          const directUrl = `${baseApi}/assets/${encodeURIComponent(
+            coinId
+          )}/history?interval=${encodeURIComponent(
+            range.interval
+          )}&start=${start}&end=${end}&apiKey=${encodeURIComponent(apiKey)}`;
+          res = await fetch(directUrl, { cache: "no-store" });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          json = await res.json();
+        } else {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const raw = Array.isArray(json?.data) ? json.data : [];
+        const parsed = raw
+          .map((row) => ({
+            time: typeof row.time === "number" ? row.time : Number(row.time),
+            price:
+              typeof row.priceUsd === "number"
+                ? row.priceUsd
+                : Number(row.priceUsd),
+          }))
+          .filter((p) => Number.isFinite(p.time) && Number.isFinite(p.price))
+          .sort((a, b) => a.time - b.time);
+
+        const points = clampPoints(parsed, 300);
+        renderChart(points);
+
+        if (chartStatus) chartStatus.classList.add("hidden");
+      } catch (e) {
+        renderChart([]);
+        if (chartStatus) {
+          chartStatus.textContent = "Falha ao carregar o gráfico.";
+          chartStatus.classList.remove("hidden");
+        }
+      }
+    };
+
+    if (rangeButtons.length) {
+      const defaultRange = "7D";
+      setActiveRange(defaultRange);
+      fetchHistory(defaultRange);
+
+      for (const btn of rangeButtons) {
+        btn.addEventListener("click", () => {
+          const rangeKey = btn.dataset.range || defaultRange;
+          setActiveRange(rangeKey);
+          fetchHistory(rangeKey);
+        });
+      }
+    }
+  </script>
 </Layout>
